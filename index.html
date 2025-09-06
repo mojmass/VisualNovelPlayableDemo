@@ -6,39 +6,6 @@
     <title>Unity Web Player | VisualNovelDemo</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-    <script>
-    // GitHub Pages Compression Fix
-    function setupUnityConfig() {
-      var buildUrl = "Build";
-      var config = {
-        arguments: [],
-        dataUrl: buildUrl + "/Web.data.unityweb",
-        frameworkUrl: buildUrl + "/Web.framework.js.unityweb",
-        codeUrl: buildUrl + "/Web.wasm.unityweb",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "VisualNovelDemo",
-        productVersion: "1.2",
-        showBanner: unityShowBanner,
-      };
-
-      // Detect GitHub Pages environment
-      function isGitHubPages() {
-        return window.location.hostname.includes('github.io');
-      }
-
-      // For GitHub Pages, use uncompressed files and enable decompression fallback
-      if (isGitHubPages()) {
-        console.log("GitHub Pages detected - applying compression workaround");
-        config.dataUrl = buildUrl + "/Web.data";
-        config.frameworkUrl = buildUrl + "/Web.framework.js";
-        config.codeUrl = buildUrl + "/Web.wasm";
-        config.decompressData = true;
-      }
-
-      return config;
-    }
-    </script>
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
@@ -86,7 +53,17 @@
 
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/Web.loader.js";
-      var config = setupUnityConfig();
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/Web.data.unityweb",
+        frameworkUrl: buildUrl + "/Web.framework.js.unityweb",
+        codeUrl: buildUrl + "/Web.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "VisualNovelDemo",
+        productVersion: "1.2",
+        showBanner: unityShowBanner,
+      };
 
       // By default, Unity keeps WebGL canvas render target size matched with
       // the DOM size of the canvas element (scaled by window.devicePixelRatio)
@@ -129,44 +106,19 @@
 
       var script = document.createElement("script");
       script.src = loaderUrl;
-      
       script.onload = () => {
-        // Additional error handling for GitHub Pages
-        if (window.location.hostname.includes('github.io')) {
-          // Add a small delay to ensure everything is loaded properly
-          setTimeout(() => {
-            createUnityInstance(canvas, config, (progress) => {
-              document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-            }).then((unityInstance) => {
-              document.querySelector("#unity-loading-bar").style.display = "none";
-              document.querySelector("#unity-fullscreen-button").onclick = () => {
-                unityInstance.SetFullscreen(1);
-              };
-            }).catch((message) => {
-              console.error("Unity initialization failed:", message);
-              unityShowBanner("Failed to load game. Please try refreshing the page or check the console for details.", "error");
-            });
-          }, 100);
-        } else {
-          // Standard loading for other hosts
-          createUnityInstance(canvas, config, (progress) => {
-            document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-          }).then((unityInstance) => {
-            document.querySelector("#unity-loading-bar").style.display = "none";
-            document.querySelector("#unity-fullscreen-button").onclick = () => {
-              unityInstance.SetFullscreen(1);
-            };
-          }).catch((message) => {
-            alert(message);
-          });
-        }
-      };
+        createUnityInstance(canvas, config, (progress) => {
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+              }).then((unityInstance) => {
+                document.querySelector("#unity-loading-bar").style.display = "none";
+                document.querySelector("#unity-fullscreen-button").onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
 
-      // Error handling for script loading failure
-      script.onerror = function() {
-        unityShowBanner("Failed to load game resources. Please check your internet connection and try again.", "error");
-        console.error("Failed to load Unity loader script:", loaderUrl);
-      };
+              }).catch((message) => {
+                alert(message);
+              });
+            };
 
       document.body.appendChild(script);
 
